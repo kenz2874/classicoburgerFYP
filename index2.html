@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLASSICO BURGER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        
+       body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #000000;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.80)), 
+                url('burgerbg.jpeg');
+            background-repeat: repeat; /* Tiles the pattern across the page */
+            background-size: 400px auto; /* Controls how large each burger looks */
+            background-attachment: fixed;
+        }
+        .text-neon {
+            text-shadow: 0 0 8px rgba(234, 179, 8, 0.6);
+        }
+
+        /* CUSTOM ANIMATIONS */
+        @keyframes logoGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(234, 179, 8, 0.3), 0 0 40px rgba(34, 197, 94, 0.2); }
+            50% { box-shadow: 0 0 35px rgba(234, 179, 8, 0.6), 0 0 60px rgba(34, 197, 94, 0.4); }
+        }
+
+        .animate-logo-glow {
+            animation: logoGlow 3s infinite ease-in-out;
+        }
+
+        @keyframes floatCart {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(-4deg); }
+        }
+
+        .animate-cart-float {
+            animation: floatCart 2.5s infinite ease-in-out;
+        }
+
+        /* Smooth Accordion Slide */
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out, padding 0.3s ease-out;
+        }
+
+        .accordion-content.open {
+            grid-template-rows: 1fr;
+        }
+
+        /* Modal Scale Animation */
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .animate-modal-pop {
+            animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen pb-20 selection:bg-yellow-500 selection:text-black">
+
+    <!-- Top Accent Bar -->
+    <div class="h-1.5 w-full bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 shadow-md shadow-yellow-500/50"></div>
+    
+    <!-- Header / Logo Area -->
+    <header class="flex flex-col items-center justify-center pt-10 pb-6 px-4">
+        <!-- Glowing Circular Logo Wrapper (Animated Pulse Glow) -->
+        <div class="w-44 h-44 rounded-full bg-gradient-to-b from-yellow-500 to-emerald-700 p-1 animate-logo-glow relative flex items-center justify-center transition-transform hover:scale-105 duration-300">
+            <!-- Inner Ring Glow Effect -->
+            <div class="absolute inset-0.5 rounded-full border-2 border-orange-500/40 animate-pulse"></div>
+            
+            <!-- Logo Image Container -->
+            <div class="w-full h-full bg-stone-950 rounded-full overflow-hidden flex items-center justify-center border border-yellow-400/30">
+                <img src="burgerlogo2.jpeg" alt="Classico Burger Logo" class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <!-- Badges (Sedap, Cepat, Panas) -->
+        <div class="flex gap-3 mt-6">
+            <span class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-500/10 to-yellow-500/20 text-yellow-400 text-[11px] font-black px-4 py-2 rounded-full border border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.2)] tracking-wider uppercase backdrop-blur-sm transform hover:scale-110 transition duration-200">
+                <span class="text-sm">😋</span> Sedap
+            </span>
+            
+            <span class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-500/10 to-yellow-500/20 text-yellow-400 text-[11px] font-black px-4 py-2 rounded-full border border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.2)] tracking-wider uppercase backdrop-blur-sm transform hover:scale-110 transition duration-200">
+                <span class="text-sm">⚡</span> Cepat
+            </span>
+            
+            <span class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-500/10 to-yellow-500/20 text-yellow-400 text-[11px] font-black px-4 py-2 rounded-full border border-yellow-400/50 shadow-[0_0_15px_rgba(234,179,8,0.2)] tracking-wider uppercase backdrop-blur-sm transform hover:scale-110 transition duration-200">
+                <span class="text-sm">🔥</span> Panas
+            </span>
+        </div>
+    </header>
+
+    <!-- Sticky Floating Order & Admin Bar -->
+    <div class="sticky top-0 z-40 bg-stone-950/80 backdrop-blur-md border-y border-yellow-500/20 py-3.5 my-4 flex flex-col items-center gap-3 shadow-lg shadow-black/80">
+        
+        <!-- Semak Order Button -->
+        <button onclick="toggleOrderModal()" class="w-64 relative group bg-gradient-to-r from-yellow-500 to-emerald-500 hover:from-yellow-400 hover:to-emerald-400 text-stone-950 font-extrabold py-2.5 rounded-xl text-sm flex items-center justify-center gap-3 shadow-[0_0_25px_rgba(234,179,8,0.4)] hover:shadow-[0_0_35px_rgba(234,179,8,0.7)] transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 border border-yellow-400/30">
+            <span class="text-base animate-cart-float">🛒</span>
+            <span class="tracking-wide text-[15px] antialiased">Semak Order</span>
+            <span id="cartCount" class="bg-stone-950 text-yellow-400 font-black px-2.5 py-0.5 rounded-md text-xs shadow-inner min-w-[24px] text-center border border-yellow-500/20 transition-transform group-hover:scale-110">
+                0
+            </span>
+        </button>
+
+        <!-- Admin Panel Button -->
+        <a href="admin.html" class="w-64 relative group bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-extrabold py-2.5 rounded-xl text-sm flex items-center justify-center gap-3 shadow-[0_0_25px_rgba(225,29,72,0.5)] hover:shadow-[0_0_35px_rgba(225,29,72,0.8)] transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 border border-red-500/40">
+            <span class="text-base transition-transform group-hover:rotate-90 duration-300">⚙️</span>
+            <span class="tracking-wide text-[15px] antialiased">Admin Panel</span>
+        </a>
+
+    </div>
+
+    <!-- Main Menu Content -->
+    <main class="max-w-2xl mx-auto px-4 space-y-8">
+
+        <!-- SECTION: CLASSICO BURGER -->
+        <section class="space-y-3">
+            <h2 class="text-md font-black text-yellow-400 flex items-center gap-2 border-b border-yellow-900/40 pb-2 tracking-wide uppercase text-neon">
+                🍽️ CLASSICO BURGER
+            </h2>
+            
+            <!-- Dynamic Menu Items Container -->
+            <div id="dynamicMenuContainer" class="space-y-2.5">
+                <!-- Loaded via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Area -->
+    <footer class="mt-16 border-t border-stone-900/60 py-8 text-center px-4 space-y-1">
+        <p class="text-[11px] text-stone-500 tracking-wide">
+            Hakcipta <span class="text-yellow-400 font-bold">CLASSICO BURGER</span> — WA: <a href="https://wa.me/60167101046" class="text-yellow-400 underline hover:text-yellow-300">016-710 1046</a>
+        </p>
+        <p class="text-[10px] text-stone-600 italic">Add-on boleh pilih selepas tekan + Add</p>
+    </footer>
+
+
+    <!-- ==================== ORDER POPUP MODAL ==================== -->
+    <div id="orderModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
+        <div id="modalBox" class="w-full max-w-sm bg-stone-950 border-l-4 border-l-yellow-400 border-y border-r border-stone-800 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden max-h-[85vh] animate-modal-pop">
+            
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-stone-800 flex justify-between items-center bg-stone-900/50">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🛒</span>
+                    <h3 class="text-xl font-black text-yellow-400 tracking-wider italic text-neon">ORDER</h3>
+                </div>
+                <button onclick="toggleOrderModal()" class="w-8 h-8 rounded-full bg-stone-800 hover:bg-red-600 hover:text-white text-stone-300 flex items-center justify-center text-sm font-bold transition duration-200">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div id="cartItemsContainer" class="p-6 flex-1 overflow-y-auto flex flex-col items-center justify-center text-center space-y-3 min-h-[220px]">
+                <div class="text-5xl opacity-40 animate-pulse">🛒</div>
+                <p class="text-stone-300 font-semibold text-sm">Troli masih kosong bro.</p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-stone-800 bg-stone-900/40 space-y-3">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-stone-400 font-bold">Jumlah</span>
+                    <span id="cartTotal" class="text-yellow-400 font-black text-base">RM 0.00</span>
+                </div>
+
+                <a id="whatsappBtn" href="#" target="_blank" class="w-full py-3 bg-stone-800 text-stone-500 font-bold rounded-xl flex items-center justify-center gap-2 text-sm pointer-events-none transition-all">
+                    <span>💬</span> Order WhatsApp
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        const defaultMenu = [
+            { name: 'CLASSICO CHICKEN', price: 5.00 },
+            { name: 'CLASSICO BEEF', price: 5.00 },
+            { name: 'CLASSICO SPECIAL', price: 6.00 },
+            { name: 'CLASSICO DOUBLE', price: 7.50 },
+            { name: 'CLASSICO DOUBLE SPECIAL', price: 9.50 },
+            { name: 'CLASSICO KING', price: 12.50 },
+            { name: 'CLASSICO OBLONG', price: 6.00 },
+            { name: 'CLASSICO KING OBLONG', price: 15.00 },
+            { name: 'CLASSICO OBLONG LAMB', price: 10.00 },
+            { name: 'CLASSICO KING OBLONG LAMB', price: 17.00 }
+        ];
+
+        let cart = [];
+
+        function loadMenu() {
+            const storedMenu = JSON.parse(localStorage.getItem('classicoMenuData')) || defaultMenu;
+            const container = document.getElementById('dynamicMenuContainer');
+            container.innerHTML = '';
+
+            storedMenu.forEach((item, index) => {
+                const icon = item.name.includes('OBLONG') ? '🥪' : '🍔';
+                const formattedPrice = parseFloat(item.price).toFixed(2);
+                
+                const itemHTML = `
+                    <div class="bg-stone-900/80 border border-yellow-900/60 rounded-2xl overflow-hidden transition-all duration-300 hover:border-yellow-500/50 shadow-md">
+                        
+                        <!-- Header -->
+                        <div onclick="toggleAccordion(${index})" class="p-4 flex justify-between items-center cursor-pointer hover:bg-stone-800/40 transition group">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl bg-stone-950 p-2.5 rounded-xl border border-stone-800 transform group-hover:scale-110 transition duration-300">${icon}</span>
+                                <div>
+                                    <h3 class="font-extrabold text-stone-100 group-hover:text-yellow-400 transition">${item.name}</h3>
+                                    <p class="text-xs text-stone-400 font-semibold mt-0.5">RM ${formattedPrice}</p>
+                                </div>
+                            </div>
+                            
+                            <span id="arrow-${index}" class="text-yellow-500 text-xs transition-transform duration-300">
+                                ▲
+                            </span>
+                        </div>
+
+                        <!-- Smooth Accordion Panel -->
+                        <div id="panel-${index}" class="accordion-content">
+                            <div class="overflow-hidden px-4 pb-4 pt-1 bg-stone-950/60 border-t border-stone-800/60">
+                                <div class="bg-stone-900/90 border border-stone-800 rounded-xl p-3 flex justify-between items-center mt-2">
+                                    <span class="text-xs font-bold text-stone-300 tracking-wide">Set / Item</span>
+                                    
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-yellow-400 font-black italic text-sm text-neon">RM ${formattedPrice}</span>
+                                        
+                                        <button onclick="addToCart('${item.name}', ${item.price})" class="bg-gradient-to-r from-yellow-500 to-emerald-500 hover:from-yellow-400 hover:to-emerald-400 text-stone-950 text-xs font-extrabold px-4 py-1.5 rounded-lg shadow-[0_0_12px_rgba(234,179,8,0.3)] transition transform active:scale-90 hover:scale-105">
+                                            + Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+                container.innerHTML += itemHTML;
+            });
+        }
+
+        function toggleAccordion(index) {
+            const panel = document.getElementById(`panel-${index}`);
+            const arrow = document.getElementById(`arrow-${index}`);
+
+            if (panel.classList.contains('open')) {
+                panel.classList.remove('open');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                panel.classList.add('open');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function addToCart(name, price) {
+            cart.push({ name, price: parseFloat(price) });
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').textContent = cart.length;
+
+            const container = document.getElementById('cartItemsContainer');
+            const totalEl = document.getElementById('cartTotal');
+            const waBtn = document.getElementById('whatsappBtn');
+
+            if (cart.length === 0) {
+                container.className = "p-6 flex-1 overflow-y-auto flex flex-col items-center justify-center text-center space-y-3 min-h-[220px]";
+                container.innerHTML = `
+                    <div class="text-5xl opacity-40 animate-pulse">🛒</div>
+                    <p class="text-stone-300 font-semibold text-sm">Troli masih kosong bro.</p>
+                `;
+                totalEl.textContent = 'RM 0.00';
+                
+                waBtn.className = "w-full py-3 bg-stone-800 text-stone-500 font-bold rounded-xl flex items-center justify-center gap-2 text-sm pointer-events-none transition-all";
+                waBtn.href = "#";
+            } else {
+                container.className = "p-4 flex-1 overflow-y-auto space-y-2 min-h-[220px]";
+                container.innerHTML = '';
+                
+                let total = 0;
+                let waMessage = "Salam Classico Burger, saya nak order:%0A";
+
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    waMessage += `- ${item.name} (RM ${item.price.toFixed(2)})%0A`;
+
+                    container.innerHTML += `
+                        <div class="flex justify-between items-center bg-stone-900/80 border border-stone-800 p-2.5 rounded-lg text-xs transform hover:scale-[1.01] transition">
+                            <span class="font-bold text-stone-200">${item.name}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-yellow-400 font-semibold">RM ${item.price.toFixed(2)}</span>
+                                <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-300 font-bold px-1.5 py-0.5 rounded bg-red-950/40 border border-red-900/40 transition hover:bg-red-900">✕</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                waMessage += `%0AJumlah: RM ${total.toFixed(2)}`;
+                totalEl.textContent = `RM ${total.toFixed(2)}`;
+
+                waBtn.className = "w-full py-3 bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-stone-950 font-black rounded-xl flex items-center justify-center gap-2 text-sm shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all transform active:scale-95";
+                waBtn.href = `https://wa.me/60167101046?text=${waMessage}`;
+            }
+        }
+
+        function toggleOrderModal() {
+            const modal = document.getElementById('orderModal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Init
+        loadMenu();
+    </script>
+
+</body>
+</html>
